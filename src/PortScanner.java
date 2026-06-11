@@ -2,7 +2,10 @@ import java.net.Socket;
 
 public class PortScanner {
     public void scan(String host, int startPort, int endPort) {
-
+        try {
+            new java.io.PrintWriter("scan-report.txt").close();
+        } catch(Exception e) {
+        }
         System.out.println("\nScanning " + host + "...\n");
 
         for (int port = startPort; port <= endPort; port++) {
@@ -17,6 +20,13 @@ public class PortScanner {
 
                     String service =
                             ServiceDetector.getService(currentPort);
+                    String reportLine =
+                            "Port "
+                                    + currentPort
+                                    + " -> "
+                                    + service;
+
+                    ReportGenerator.write(reportLine);
 
                     System.out.println(
                             "[OPEN] Port "
