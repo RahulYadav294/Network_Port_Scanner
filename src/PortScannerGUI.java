@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.net.Socket;
 
 public class PortScannerGUI extends JFrame {
 
@@ -39,5 +40,50 @@ public class PortScannerGUI extends JFrame {
         add(new JScrollPane(resultArea), BorderLayout.CENTER);
 
         setVisible(true);
+        scanButton.addActionListener(e -> {
+
+            String host = hostField.getText();
+
+            int startPort =
+                    Integer.parseInt(startPortField.getText());
+
+            int endPort =
+                    Integer.parseInt(endPortField.getText());
+
+            resultArea.setText("");
+
+            new Thread(() -> {
+
+                for(int port = startPort;
+                    port <= endPort;
+                    port++) {
+
+                    try {
+
+                        Socket socket =
+                                new Socket(host, port);
+
+                        String service =
+                                ServiceDetector.getService(port);
+
+                        String result =
+                                "[OPEN] Port "
+                                        + port
+                                        + " -> "
+                                        + service
+                                        + "\n";
+
+                        resultArea.append(result);
+
+                        socket.close();
+
+                    } catch(Exception ex) {
+
+                    }
+                }
+
+            }).start();
+
+        });
     }
 }
