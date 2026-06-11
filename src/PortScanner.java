@@ -11,8 +11,14 @@ public class PortScanner {
             try {
                 Socket socket = new Socket(host, port);
 
-                System.out.println("[OPEN] Port " + port);
+                String service = ServiceDetector.getService(port);
 
+                System.out.println(
+                        "[OPEN] Port "
+                                + port
+                                + " -> "
+                                + service
+                );
                 socket.close();
 
             } catch (Exception e) {
