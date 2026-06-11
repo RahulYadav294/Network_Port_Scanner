@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.net.Socket;
+import javax.swing.JOptionPane;
 
 public class PortScannerGUI extends JFrame {
 
@@ -42,15 +43,73 @@ public class PortScannerGUI extends JFrame {
         setVisible(true);
         scanButton.addActionListener(e -> {
 
-            String host = hostField.getText();
+            String host = hostField.getText().trim();
 
-            int startPort =
-                    Integer.parseInt(startPortField.getText());
+            if(host.isEmpty()) {
 
-            int endPort =
-                    Integer.parseInt(endPortField.getText());
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Host/IP cannot be empty!"
+                );
+
+                return;
+            }
+
+            int startPort;
+            int endPort;
+
+            try {
+
+                startPort =
+                        Integer.parseInt(
+                                startPortField.getText().trim());
+
+                endPort =
+                        Integer.parseInt(
+                                endPortField.getText().trim());
+
+            } catch(NumberFormatException ex) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ports must be numbers!"
+                );
+
+                return;
+            }
+
+            if(startPort < 1 || startPort > 65535) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Start Port must be between 1 and 65535!"
+                );
+
+                return;
+            }
+
+            if(endPort < 1 || endPort > 65535) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "End Port must be between 1 and 65535!"
+                );
+
+                return;
+            }
+
+            if(startPort > endPort) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Start Port cannot be greater than End Port!"
+                );
+
+                return;
+            }
 
             resultArea.setText("");
+            
 
             new Thread(() -> {
 
