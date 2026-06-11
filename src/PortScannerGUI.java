@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.Socket;
 import javax.swing.JOptionPane;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PortScannerGUI extends JFrame {
 
@@ -112,34 +114,50 @@ public class PortScannerGUI extends JFrame {
             long startTime = System.currentTimeMillis();
 
             new Thread(() -> {
+
+                ExecutorService executor =
+                        Executors.newFixedThreadPool(10);
                 final int[] openPortCount = {0};
                 for(int port = startPort;
                     port <= endPort;
                     port++) {
 
-                    try {
+                    final int currentPort = port;
 
-                        Socket socket =
-                                new Socket(host, port);
-                        openPortCount[0]++;
+                    executor.execute(() -> {
 
-                        String service =
-                                ServiceDetector.getService(port);
+                        try {
 
-                        String result =
-                                "[OPEN] Port "
-                                        + port
-                                        + " -> "
-                                        + service
-                                        + "\n";
+                            Socket socket =
+                                    new Socket(host, currentPort);
 
-                        resultArea.append(result);
+                            openPortCount[0]++;
 
-                        socket.close();
+                            String service =
+                                    ServiceDetector
+                                            .getService(currentPort);
 
-                    } catch(Exception ex) {
+                            String result =
+                                    "[OPEN] Port "
+                                            + currentPort
+                                            + " -> "
+                                            + service
+                                            + "\n";
 
-                    }
+                            resultArea.append(result);
+
+                            socket.close();
+
+                        } catch(Exception ex) {
+
+                        }
+
+                    });
+                }
+                executor.shutdown();
+
+                while(!executor.isTerminated()) {
+
                 }
                 long endTime = System.currentTimeMillis();
 
