@@ -109,10 +109,10 @@ public class PortScannerGUI extends JFrame {
             }
 
             resultArea.setText("");
-            
+            long startTime = System.currentTimeMillis();
 
             new Thread(() -> {
-
+                final int[] openPortCount = {0};
                 for(int port = startPort;
                     port <= endPort;
                     port++) {
@@ -121,6 +121,7 @@ public class PortScannerGUI extends JFrame {
 
                         Socket socket =
                                 new Socket(host, port);
+                        openPortCount[0]++;
 
                         String service =
                                 ServiceDetector.getService(port);
@@ -140,6 +141,41 @@ public class PortScannerGUI extends JFrame {
 
                     }
                 }
+                long endTime = System.currentTimeMillis();
+
+                double seconds =
+                        (endTime - startTime) / 1000.0;
+
+                int totalPorts =
+                        endPort - startPort + 1;
+                resultArea.append("\n");
+                resultArea.append("====================\n");
+                resultArea.append("SCAN SUMMARY\n");
+                resultArea.append("====================\n");
+
+                resultArea.append(
+                        "Target: "
+                                + host
+                                + "\n"
+                );
+
+                resultArea.append(
+                        "Total Ports Scanned: "
+                                + totalPorts
+                                + "\n"
+                );
+
+                resultArea.append(
+                        "Open Ports Found: "
+                                + openPortCount[0]
+                                + "\n"
+                );
+
+                resultArea.append(
+                        "Time Taken: "
+                                + seconds
+                                + " seconds\n"
+                );
 
             }).start();
 
