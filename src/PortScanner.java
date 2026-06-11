@@ -1,31 +1,41 @@
 import java.net.Socket;
 
 public class PortScanner {
-
     public void scan(String host, int startPort, int endPort) {
 
         System.out.println("\nScanning " + host + "...\n");
 
         for (int port = startPort; port <= endPort; port++) {
 
-            try {
-                Socket socket = new Socket(host, port);
+            final int currentPort = port;
 
-                String service = ServiceDetector.getService(port);
+            Thread thread = new Thread(() -> {
 
-                System.out.println(
-                        "[OPEN] Port "
-                                + port
-                                + " -> "
-                                + service
-                );
-                socket.close();
+                try {
 
-            } catch (Exception e) {
-                // Port is closed
-            }
+                    Socket socket = new Socket(host, currentPort);
+
+                    String service =
+                            ServiceDetector.getService(currentPort);
+
+                    System.out.println(
+                            "[OPEN] Port "
+                                    + currentPort
+                                    + " -> "
+                                    + service
+                    );
+
+                    socket.close();
+
+                } catch (Exception e) {
+                    // closed
+                }
+
+            });
+
+            thread.start();
         }
 
-        System.out.println("\nScan Completed.");
+        System.out.println("\nScan Initiated...");
     }
 }
